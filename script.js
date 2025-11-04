@@ -1,14 +1,25 @@
 // add javascript here
-let level, answer, score;
+let level, answer, score, loss;
+loss=0;
 const scoreArr=[];
 const levelArr=document.getElementsByName("level");
 date.textContent=time();
+let nam;
 
 playBtn.addEventListener("click",play);
 guessBtn.addEventListener("click",makeGuess);
-giveUp.addEventListener("click",giveup)
+giveUp.addEventListener("click",quit);
 
 function play(){
+    nam = document.getElementById("yourname").value
+    if(nam==""){
+        msg.textContent="Please enter your name"
+        return;
+    }
+    else{
+        nam=nam.toLowerCase();
+        nam=nam.charAt(0).toUpperCase()+nam.slice(1);
+    }
     score=0;
     playBtn.disabled=true;
     guessBtn.disabled=false;
@@ -21,7 +32,7 @@ function play(){
         }
         levelArr[i].disabled=true;
     }
-    msg.textContent="Guess a number from 1-"+level;
+    msg.textContent=nam+", please guess a number from 1-"+level;
     answer = Math.floor(Math.random()*level+1);
     guess.placeholder=answer;
 }
@@ -33,28 +44,41 @@ function makeGuess(){
     }
     score++;
     if(userGuess<answer){
-        msg.textContent="Too low!";
+        msg.textContent=nam+", you guessed too low!";
     }
     else if(userGuess>answer){
-        msg.textContent="Too high!";
+        msg.textContent=nam+", you guessed too high!";
     }
     else{
-        msg.textContent="Wow you got it right in "+score+" guess";
+        msg.textContent="Wow! "+nam+"! You got it right in "+score+" guess";
         if(score!=1){
-            msg.textContent+="es";
+            msg.textContent+="es! ";
+            if(score>=(Math.ceil(Math.log2(level)))){
+                msg.textContent+="That was really good! You optimized your guesses!"
+            }
+            else if(score>=level/4*3){
+                msg.textContent+="That was good! Try and optimize your guesses better next time!"
+            }
+            else{
+                msg.textContent+="You're bad at guessing."
+            }
         }
-        msg.textContent+="! Press play to play again";
+        else{
+            msg.textContent+="! You got so lucky!"
+        }
+        msg.textContent+=" Press play to play again";
         reset();
         updateScore();
         return;
     }
-    if(Math.abs(answer-userGuess)/level<=0.05){
+    let dist = Math.abs(answer-userGuess)/level
+    if(dist<=0.05){
         msg.textContent+=" (Hot)"
     }
-    else if(Math.abs(answer-userGuess)/level<=0.15){
+    else if(dist<=0.15){
         msg.textContent+=" (Warm)"
     }
-    else if(Math.abs(answer-userGuess)/level<=0.6){
+    else if(dist<=0.6){
         msg.textContent+=" (Cold)"
     }
     else{
@@ -76,16 +100,22 @@ function updateScore(){
     scoreArr.push(score);
     scoreArr.sort((a,b)=>a-b);
     let lb=document.getElementsByName("leaderboard");
-    wins.textContent="Total wins: "+scoreArr.length;
+    wins.textContent="Total wins: "+(scoreArr.length-loss);
     let sum=0
     for(let i=0;i<scoreArr.length;i++){
-        sum+=scoreArr[i];
+        sum+=Number(scoreArr[i]);
         if(i<lb.length){
             lb[i].textContent=scoreArr[i];
         }
     }
     let avg=sum/scoreArr.length;
     avgScore.textContent="Average Score: "+avg.toFixed(2);
+}
+function quit(){
+    loss++;
+    score=level;
+    updateScore();
+    reset();
 }
 function time(){
     let d = new Date();
