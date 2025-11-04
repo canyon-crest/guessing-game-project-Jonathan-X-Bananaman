@@ -50,13 +50,13 @@ function makeGuess(){
         msg.textContent=nam+", you guessed too high!";
     }
     else{
-        msg.textContent="Wow! "+nam+"! You got it right in "+score+" guess";
+        msg.textContent=nam+", you got it right in "+score+" guess";
         if(score!=1){
             msg.textContent+="es! ";
-            if(score>=(Math.ceil(Math.log2(level)))){
+            if(score<=(Math.ceil(Math.log2(level)))){
                 msg.textContent+="That was really good! You optimized your guesses!"
             }
-            else if(score>=level/4*3){
+            else if(score<=level/4*3){
                 msg.textContent+="That was good! Try and optimize your guesses better next time!"
             }
             else{
