@@ -2,13 +2,14 @@
 let level, answer, score, loss, starttime, intervalId, timepassed;
 loss=0;
 const scoreArr=[];
+const timeArr=[];
 const levelArr=document.getElementsByName("level");
-date.textContent=time();
 let nam;
-
+setInterval(time,1000);
 playBtn.addEventListener("click",play);
 guessBtn.addEventListener("click",makeGuess);
 giveUp.addEventListener("click",quit);
+sw.textContent="Timer: 00:00.00";
 
 function play(){
     nam = document.getElementById("yourname").value
@@ -24,7 +25,7 @@ function play(){
     st=Date.now();
     intervalId = setInterval(() => {
         timepassed = Date.now() - st;
-        sw.textContent = "Timer: "+timepassed;
+        sw.textContent="Timer: "+formattime(timepassed);
     }, 10);
     playBtn.disabled=true;
     guessBtn.disabled=false;
@@ -92,7 +93,6 @@ function makeGuess(){
 }
 function reset(){
     clearInterval(intervalId);
-    timepassed=0;
     guessBtn.disabled=true;
     guess.disabled=true;
     guess.value="";
@@ -105,26 +105,99 @@ function reset(){
 }
 function updateScore(){
     scoreArr.push(score);
+    timeArr.push(timepassed);
     scoreArr.sort((a,b)=>a-b);
+    timeArr.sort((a,b)=>a-b);
     let lb=document.getElementsByName("leaderboard");
     wins.textContent="Total wins: "+(scoreArr.length-loss);
-    let sum=0
+    let avgsum=0;
+    let timesum=0;
     for(let i=0;i<scoreArr.length;i++){
-        sum+=Number(scoreArr[i]);
+        avgsum+=Number(scoreArr[i]);
         if(i<lb.length){
             lb[i].textContent=scoreArr[i];
         }
     }
-    let avg=sum/scoreArr.length;
-    avgScore.textContent="Average Score: "+avg.toFixed(2);
+    for(let i=0;i<timeArr.length;i++){
+        timesum+=Number(timeArr[i]);
+    }
+    let avgs=avgsum/scoreArr.length;
+    let avgt=timesum/timeArr.length;
+    avgScore.textContent="Average Score: "+avgs.toFixed(2);
+    avgstopwatch.textContent="Average Time: "+formattime(avgt);
+    besttime.textContent="Best time: "+formattime(timeArr[0]);
+    timepassed=0;
 }
 function quit(){
     loss++;
     score=level;
-    updateScore();
+    sw.textContent="Timer: 00:00.00";
     reset();
+    updateScore();
 }
 function time(){
     let d = new Date();
-    return d;
+    let month= d.getMonth()+1;
+    let day=d.getDate();
+    if(month==1){
+        month="January"
+    }
+    else if(month==2){
+        month="Feburary"
+    }
+    else if(month==3){
+        month="March"
+    }
+    else if(month==4){
+        month="April"
+    }
+    else if(month==5){
+        month="May"
+    }
+    else if(month==6){
+        month="June"
+    }
+    else if(month==7){
+        month="July"
+    }
+    else if(month==8){
+        month="August"
+    }
+    else if(month==9){
+        month="September"
+    }
+    else if(month==10){
+        month="October"
+    }
+    else if(month==11){
+        month="November"
+    }
+    else{
+        month="December"
+    }
+    if(day==1||day==21||day==31){
+        day+="st";
+    }
+    else if(day==2||day==22){
+        day+="nd"
+    }
+    else if(day==3||day==23){
+        day+="rd"
+    }
+    else{
+        day+="th"
+    }
+    date.textContent=month+" "+day+" "+d.getFullYear()+"  "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+}
+function formattime(t){
+    milliseconds=t%1000;
+    seconds=Math.floor((t/1000)%60);
+    minutes=Math.floor((t/1000)/60%60);
+    if(minutes>=60){
+        msg.textContent=nam+", stop being AFK, i'm quitting the game"
+        reset();
+        return;
+    }
+    let aaaa = String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0")+"."+Math.floor(milliseconds/10);
+    return aaaa;
 }
