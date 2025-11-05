@@ -1,5 +1,5 @@
 // add javascript here
-let level, answer, score, loss;
+let level, answer, score, loss, starttime, intervalId, timepassed;
 loss=0;
 const scoreArr=[];
 const levelArr=document.getElementsByName("level");
@@ -21,6 +21,11 @@ function play(){
         nam=nam.charAt(0).toUpperCase()+nam.slice(1);
     }
     score=0;
+    st=Date.now();
+    intervalId = setInterval(() => {
+        timepassed = Date.now() - st;
+        sw.textContent = "Timer: "+timepassed;
+    }, 10);
     playBtn.disabled=true;
     guessBtn.disabled=false;
     giveUp.disabled=false;
@@ -86,6 +91,8 @@ function makeGuess(){
     }
 }
 function reset(){
+    clearInterval(intervalId);
+    timepassed=0;
     guessBtn.disabled=true;
     guess.disabled=true;
     guess.value="";
