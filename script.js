@@ -1,6 +1,7 @@
 // add javascript here
 let level, answer, score, loss, starttime, intervalId, timepassed;
 loss=0;
+let guesshistory=false;
 const scoreArr=[];
 const timeArr=[];
 const levelArr=document.getElementsByName("level");
@@ -9,9 +10,13 @@ setInterval(time,1000);
 playBtn.addEventListener("click",play);
 guessBtn.addEventListener("click",makeGuess);
 giveUp.addEventListener("click",quit);
+helpBtn.addEventListener("click",turnhelponoff);
 sw.textContent="Timer: 00:00.00";
-
+const guessesArr=[];
+const distArr=[];
+const bigsmallArr=[];
 function play(){
+    document.getElementById("userguesses").innerHTML=" ";
     nam = document.getElementById("yourname").value
     if(nam==""){
         msg.textContent="Please enter your name"
@@ -27,6 +32,7 @@ function play(){
         timepassed = Date.now() - st;
         sw.textContent="Timer: "+formattime(timepassed);
     }, 10);
+    helpBtn.disabled=false;
     playBtn.disabled=true;
     guessBtn.disabled=false;
     giveUp.disabled=false;
@@ -40,7 +46,7 @@ function play(){
     }
     msg.textContent=nam+", please guess a number from 1-"+level;
     answer = Math.floor(Math.random()*level+1);
-    guess.placeholder=answer;
+    guess.placeholder=answer;//delete later
 }
 function makeGuess(){
     let userGuess=Number(guess.value);
@@ -49,10 +55,13 @@ function makeGuess(){
         return;
     }
     score++;
+    document.getElementById("userguesses").innerHTML=" ";
     if(userGuess<answer){
+        bigsmallArr.push("too low");
         msg.textContent=nam+", you guessed too low!";
     }
     else if(userGuess>answer){
+        bigsmallArr.push("too high");
         msg.textContent=nam+", you guessed too high!";
     }
     else{
@@ -80,15 +89,26 @@ function makeGuess(){
     let dist = Math.abs(answer-userGuess)/level
     if(dist<=0.05){
         msg.textContent+=" (Hot)"
+        distArr.push("(Hot)");
     }
     else if(dist<=0.15){
         msg.textContent+=" (Warm)"
+        distArr.push("(Warm)");
     }
     else if(dist<=0.6){
         msg.textContent+=" (Cold)"
+        distArr.push("(Cold)");
     }
     else{
         msg.textContent+=" (Ice cold!)"
+        distArr.push("(Ice cold)");
+    }
+    guessesArr.push(userGuess);
+    for(let i=0;i<guessesArr.length;i++){
+        let guesses=document.getElementById("userguesses");
+        if(guesshistory){
+            guesses.innerHTML+="<li>"+guessesArr[i]+", "+bigsmallArr[i]+" "+distArr[i]+"</li>"
+        }
     }
 }
 function reset(){
@@ -99,6 +119,11 @@ function reset(){
     guess.placeholder="";
     giveUp.disabled=true;
     playBtn.disabled=false;
+    helpBtn.disabled=true;
+    guessesArr.length=0;
+    distArr.length=0;
+    bigsmallArr.length=0;
+    document.getElementById("userguesses").innerHTML=" ";
     for(let i=0;i<levelArr.length;i++){
         levelArr[i].disabled=false;
     }
@@ -187,7 +212,7 @@ function time(){
     else{
         day+="th"
     }
-    date.textContent=month+" "+day+" "+d.getFullYear()+"  "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+    date.textContent=month+" "+day+" "+d.getFullYear()+"  "+addzero(d.getHours())+":"+addzero(d.getMinutes())+":"+addzero(d.getSeconds());
 }
 function formattime(t){
     milliseconds=t%1000;
@@ -198,6 +223,30 @@ function formattime(t){
         reset();
         return;
     }
-    let aaaa = String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0")+"."+Math.floor(milliseconds/10);
+    let aaaa = addzero(minutes)+":"+addzero(seconds)+"."+Math.floor(milliseconds/10);
     return aaaa;
+}
+function addzero(aaa){
+    if(aaa<=9){
+        aaa="0"+aaa.toString();
+    }
+    return aaa;
+}
+function turnhelponoff(){
+    if(!guesshistory){
+        guesshistory=true;
+        document.getElementById("ghtitle").innerHTML="Guess History"
+        helpBtn.textContent="Show Previous Guesses: On"
+        for(let i=0;i<guessesArr.length;i++){
+            let guesses=document.getElementById("userguesses");
+            guesses.innerHTML+="<li>"+guessesArr[i]+" "+distArr[i]+"</li>"
+        }
+    }
+    else{
+        helpBtn.textContent="Show Previous Guesses: Off"
+        document.getElementById("userguesses").innerHTML=" ";
+        document.getElementById("ghtitle").innerHTML=" "
+        guesshistory=false;
+    }
+    
 }
