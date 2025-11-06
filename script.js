@@ -1,5 +1,5 @@
 // add javascript here
-let level, answer, score, loss, starttime, intervalId, timepassed;
+let level, answer, score, loss, starttime, intervalId, timepassed, l;
 loss=0;
 let guesshistory=false;
 const scoreArr=[];
@@ -129,7 +129,9 @@ function reset(){
 }
 function updateScore(){
     scoreArr.push([score,nam]);
-    timeArr.push(timepassed);
+    if(!l){
+        timeArr.push(timepassed);
+    }
     scoreArr.sort((a,b)=>a[0]-b[0]);
     timeArr.sort((a,b)=>a-b);
     let lb=document.getElementsByName("leaderboard");
@@ -148,12 +150,16 @@ function updateScore(){
     let avgs=avgsum/scoreArr.length;
     let avgt=timesum/timeArr.length;
     avgScore.textContent="Average Score: "+avgs.toFixed(2)+" guesses";
-    avgstopwatch.textContent="Average Time: "+formattime(avgt);
-    besttime.textContent="Best time: "+formattime(timeArr[0]);
+    if(!l){
+        avgstopwatch.textContent="Average Time: "+formattime(avgt);
+        besttime.textContent="Best time: "+formattime(timeArr[0]);   
+    }
     timepassed=0;
+    l=false;
 }
 function quit(){
     loss++;
+    l=true;
     score=level;
     sw.textContent="Timer: 00:00.00";
     reset();
