@@ -46,7 +46,6 @@ function play(){
     }
     msg.textContent=nam+", please guess a number from 1-"+level;
     answer = Math.floor(Math.random()*level+1);
-    guess.placeholder=answer;//delete later
 }
 function makeGuess(){
     let userGuess=Number(guess.value);
@@ -129,18 +128,18 @@ function reset(){
     }
 }
 function updateScore(){
-    scoreArr.push(score);
+    scoreArr.push([score,nam]);
     timeArr.push(timepassed);
-    scoreArr.sort((a,b)=>a-b);
+    scoreArr.sort((a,b)=>a[0]-b[0]);
     timeArr.sort((a,b)=>a-b);
     let lb=document.getElementsByName("leaderboard");
     wins.textContent="Total wins: "+(scoreArr.length-loss);
     let avgsum=0;
     let timesum=0;
     for(let i=0;i<scoreArr.length;i++){
-        avgsum+=Number(scoreArr[i]);
+        avgsum+=Number(scoreArr[i][0]);
         if(i<lb.length){
-            lb[i].textContent=scoreArr[i];
+            lb[i].textContent=scoreArr[i][0]+" guesses, by "+scoreArr[i][1];
         }
     }
     for(let i=0;i<timeArr.length;i++){
@@ -148,7 +147,7 @@ function updateScore(){
     }
     let avgs=avgsum/scoreArr.length;
     let avgt=timesum/timeArr.length;
-    avgScore.textContent="Average Score: "+avgs.toFixed(2);
+    avgScore.textContent="Average Score: "+avgs.toFixed(2)+" guesses";
     avgstopwatch.textContent="Average Time: "+formattime(avgt);
     besttime.textContent="Best time: "+formattime(timeArr[0]);
     timepassed=0;
@@ -239,7 +238,7 @@ function turnhelponoff(){
         helpBtn.textContent="Show Previous Guesses: On"
         for(let i=0;i<guessesArr.length;i++){
             let guesses=document.getElementById("userguesses");
-            guesses.innerHTML+="<li>"+guessesArr[i]+" "+distArr[i]+"</li>"
+            guesses.innerHTML+="<li>"+guessesArr[i]+", "+bigsmallArr[i]+" "+distArr[i]+"</li>"
         }
     }
     else{
